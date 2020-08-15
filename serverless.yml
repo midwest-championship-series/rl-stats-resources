@@ -1,0 +1,41 @@
+service: rl-stats-resources
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: rl-stats
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  endpointType: REGIONAL
+  memorySize: 256
+  vpc:
+    securityGroupIds:
+      - ${cf:rl-stats-setup-prod.SecurityGroupId}
+    subnetIds:
+      - ${cf:rl-stats-setup-prod.PrivateSubNetA}
+      - ${cf:rl-stats-setup-prod.PrivateSubNetB}
+  environment:
+    MONGODB_PASSWORD_DEV: ${ssm:dev-mnrl-db-pass~true}
+    MONGODB_HOST_DEV: mnrl-dev-7nmqy.mongodb.net
+    MONGODB_USERNAME_DEV: mnrl_stats
+    MONGODB_PASSWORD_PROD: ${ssm:prod-mnrl-db-pass~true}
+    MONGODB_HOST_PROD: mnrl-7nmqy.mongodb.net
+    MONGODB_USERNAME_PROD: mnrl_stats
+    ERROR_CHANNEL_ID: '692994579305332806'
+  stackTags:
+    Project: rl-stats
+    Role: ${self:service}
+
+layers:
+  mongotools:
+    package:
+      artifact: bin.zip
+      name: ${self:provider.stage}-mongotools
+
+functions:
+  backup:
+    handler: lambdas/backup.handler
+    name: ${self:service}-backup-${self:provider.stage}
+    timeout: 300
+    layers:
+      - { Ref: MongotoolsLambdaLayer }
