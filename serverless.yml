@@ -5,6 +5,7 @@ provider:
   runtime: nodejs12.x
   profile: rl-stats
   region: ${opt:region, 'us-east-1'}
+  versions: false # still needs to be deployed
   stage: prod # only one instance of this service should be deployed
   endpointType: REGIONAL
   memorySize: 256
@@ -63,7 +64,7 @@ resources:
         LifecycleConfiguration:
           Rules:
             - Status: Enabled
-              ExpirationInDays: '7'
+              ExpirationInDays: '30'
   Outputs:
     BackupsBucket:
       Value:
