@@ -1,22 +1,9 @@
 const fs = require('fs')
 const zip = require('zip-a-folder')
-const AWS = require('aws-sdk')
 const moment = require('moment')
-const { exec } = require('child_process')
 
-const s3 = new AWS.S3({ apiVersion: '2006-03-01' })
-
-const mongodump = ({ username, password, host, database, outPath }) => {
-  return new Promise((resolve, reject) => {
-    exec(
-      `mongodump --uri mongodb+srv://${username}:${password}@${host}/${database} --out ${outPath}`,
-      (error, stdout) => {
-        if (error) return reject(error)
-        return resolve(stdout)
-      },
-    )
-  })
-}
+const { mongodump } = require('../src/mongo')
+const { s3 } = require('../src/aws')
 
 const zipFolder = outPath => {
   return new Promise((resolve, reject) => {
@@ -32,7 +19,8 @@ const handler = async event => {
   const { database } = event
   const { MONGODB_USERNAME_PROD, MONGODB_HOST_PROD, MONGODB_PASSWORD_PROD, BACKUPS_BUCKET } = process.env
   const dateStr = `${moment().format('MM-DD-YYYY')}-${Date.now()}`
-  const outPath = `/tmp/${dateStr}`
+  const zipPath = `/tmp/${dateStr}`
+  const outPath = `${zipPath}/dump`
   await mongodump({
     username: MONGODB_USERNAME_PROD,
     password: MONGODB_PASSWORD_PROD,
@@ -40,7 +28,7 @@ const handler = async event => {
     database,
     outPath,
   })
-  const zipped = await zipFolder(outPath)
+  const zipped = await zipFolder(zipPath)
   const data = fs.readFileSync(zipped)
   const bucketParams = {
     Bucket: BACKUPS_BUCKET,
