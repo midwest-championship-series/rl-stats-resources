@@ -12,11 +12,12 @@ const mongodump = ({ username, password, host, database, outPath }) => {
   })
 }
 
-const mongorestore = ({ username, password, host, dumpFolder }) => {
+const mongorestore = ({ username, password, host, dumpPath }) => {
   return new Promise((resolve, reject) => {
-    exec(`mongorestore --uri mongodb+srv://${username}:${password}@${host} ${dumpFolder}`, (err, stdout) => {
+    exec(`mongorestore --uri mongodb+srv://${username}:${password}@${host} ${dumpPath}`, (err, stdout) => {
       if (err) return reject(err)
-      return resolve(stdout)
+      console.log(stdout)
+      return resolve()
     })
   })
 }
