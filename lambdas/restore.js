@@ -2,7 +2,7 @@ const fs = require('fs')
 const unzipper = require('unzipper')
 
 const { s3 } = require('../src/aws')
-const { mongorestore } = require('../src/mongo')
+const { mongorestore, dropDatabases } = require('../src/mongo')
 
 const getConnection = restoreTo => {
   if (restoreTo === 'prod') {
@@ -35,15 +35,16 @@ const getAndUnzip = async (Key, Bucket, path) => {
 }
 
 const handler = async event => {
+  const downloadPath = `/tmp`
+  const dumpPath = `${downloadPath}/dump`
   try {
     const { backupKey, restoreTo } = event
     if (!backupKey) throw new Error('backup key required')
     const { BACKUPS_BUCKET } = process.env
     const { username, password, host } = getConnection(restoreTo)
-    const downloadPath = `/tmp`
-    const dumpPath = `${downloadPath}/dump`
     await getAndUnzip(backupKey, BACKUPS_BUCKET, downloadPath)
     if (!fs.existsSync(dumpPath)) throw new Error('no dump folder located to restore from')
+    await dropDatabases({ databases: fs.readdirSync(dumpPath), username, password, host })
     await mongorestore({ username, password, host, dumpPath })
   } catch (err) {
     console.error(err)

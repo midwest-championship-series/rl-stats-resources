@@ -1,4 +1,5 @@
 const { exec } = require('child_process')
+const { MongoClient } = require('mongodb')
 
 const mongodump = ({ username, password, host, database, outPath }) => {
   return new Promise((resolve, reject) => {
@@ -22,7 +23,22 @@ const mongorestore = ({ username, password, host, dumpPath }) => {
   })
 }
 
+const dropDatabases = async ({ databases, username, password, host }) => {
+  for (let database of databases) {
+    await new Promise((resolve, reject) => {
+      const url = `mongodb+srv://${username}:${password}@${host}`
+      MongoClient.connect(url, async (err, client) => {
+        if (err) return reject(err)
+        await client.db(database).dropDatabase()
+        client.close()
+        return resolve()
+      })
+    })
+  }
+}
+
 module.exports = {
   mongodump,
   mongorestore,
+  dropDatabases,
 }
