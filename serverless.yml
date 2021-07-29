@@ -5,7 +5,7 @@ provider:
   runtime: nodejs12.x
   profile: rl-stats
   region: ${opt:region, 'us-east-1'}
-  versions: false # still needs to be deployed
+  versions: false
   stage: prod # only one instance of this service should be deployed
   endpointType: REGIONAL
   memorySize: 256
@@ -41,6 +41,18 @@ layers:
       artifact: bin.zip
       name: ${self:provider.stage}-mongotools
 
+package:
+  exclude:
+    - node_modules/**/aws-sdk/**
+    - ./src/**/*.spec.*
+    - .eslintrc*
+    - .prettierrc*
+    - .vscode*
+    - README*
+    - ./**/__tests__/**
+    - temp/**
+    - .env
+
 functions:
   backup:
     handler: lambdas/backup.handler
@@ -54,6 +66,12 @@ functions:
           enabled: true
           input:
             database: mnrl
+  restore:
+    handler: lambdas/restore.handler
+    name: ${self:service}-restore-${self:provider.stage}
+    timeout: 600
+    layers:
+      - { Ref: MongotoolsLambdaLayer }
 
 resources:
   Resources:
