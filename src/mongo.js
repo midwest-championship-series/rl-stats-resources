@@ -12,7 +12,14 @@ const mongodump = ({ username, password, host, database, outPath }) => {
   })
 }
 
-const mongorestore = ({ username, password, host, database }) => {}
+const mongorestore = ({ username, password, host, dumpFolder }) => {
+  return new Promise((resolve, reject) => {
+    exec(`mongorestore --uri mongodb+srv://${username}:${password}@${host} ${dumpFolder}`, (err, stdout) => {
+      if (err) return reject(err)
+      return resolve(stdout)
+    })
+  })
+}
 
 module.exports = {
   mongodump,

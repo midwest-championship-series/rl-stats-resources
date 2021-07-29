@@ -11,7 +11,9 @@
     "prettier": "^2.0.5"
   },
   "dependencies": {
+    "aws-sdk": "2.880.0",
     "moment": "^2.27.0",
+    "unzipper": "^0.10.11",
     "zip-a-folder": "^0.0.12"
   }
 }
