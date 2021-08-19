@@ -16,7 +16,7 @@ const zipFolder = outPath => {
 }
 
 const handler = async event => {
-  const { database } = event
+  const database = event.database || 'mnrl'
   const { MONGODB_USERNAME_PROD, MONGODB_HOST_PROD, MONGODB_PASSWORD_PROD, BACKUPS_BUCKET } = process.env
   const dateStr = `${moment().format('MM-DD-YYYY')}-${Date.now()}`
   const zipPath = `/tmp/${dateStr}`
