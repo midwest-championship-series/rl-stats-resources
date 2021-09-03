@@ -11,8 +11,7 @@ const handler = async (event, context, callback) => {
       .promise()
     const response = {
       statusCode: 200,
-      headers: obj,
-      body: '',
+      body: JSON.stringify(obj),
     }
     callback(null, response)
   } catch (err) {
@@ -25,15 +24,17 @@ const handler = async (event, context, callback) => {
 
 const download = async event => {
   try {
-    const obj = await s3
-      .getObject({
-        Bucket: 'mncs-plugin-bucket',
-        Key: 'MNCS.dll',
-      })
-      .promise()
-    return obj
+    return {
+      statusCode: 302,
+      headers: {
+        Location: 'https://mncs-plugin-bucket.s3.us-east-2.amazonaws.com/MNCS.dll',
+      },
+    }
   } catch (err) {
-    return err
+    callback(null, {
+      statusCode: 500,
+      body: "Couldn't retrieve object info.",
+    })
   }
 }
 
