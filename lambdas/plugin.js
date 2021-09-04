@@ -17,7 +17,7 @@ const handler = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: 500,
-      body: "Couldn't retrieve object info.",
+      body: "{'error':'Failed to retrieve object.'}",
     })
   }
 }
@@ -33,7 +33,7 @@ const download = async event => {
   } catch (err) {
     callback(null, {
       statusCode: 500,
-      body: "Couldn't retrieve object info.",
+      body: "{'error':'Failed to retrieve object.'}",
     })
   }
 }
