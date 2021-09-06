@@ -63,15 +63,6 @@ functions:
     timeout: 300
     events:
       - http: GET plugin
-  plugin-download:
-    handler: lambdas/plugin.download
-    name: ${self:service}-plugindownload-${self:provider.stage}
-    timeout: 300
-    events:
-      - http:
-          cors: true
-          method: get
-          path: plugin/download
   backup:
     handler: lambdas/backup.handler
     name: ${self:service}-backup-${self:provider.stage}
