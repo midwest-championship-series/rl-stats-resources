@@ -1,5 +1,8 @@
 service: rl-stats-resources
 
+plugins:
+  - serverless-offline
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -54,6 +57,12 @@ package:
     - .env
 
 functions:
+  plugin-check:
+    handler: lambdas/plugin.handler
+    name: ${self:service}-plugincheck-${self:provider.stage}
+    timeout: 300
+    events:
+      - http: GET plugin
   backup:
     handler: lambdas/backup.handler
     name: ${self:service}-backup-${self:provider.stage}
