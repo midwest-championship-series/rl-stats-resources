@@ -4,13 +4,13 @@ const handler = async (event, context, callback) => {
   try {
     const obj = await s3
       .headObject({
-        Bucket: 'mncs-plugin-bucket',
-        Key: 'MNCS.dll',
+        Bucket: 'rl-plugin',
+        Key: 'SOSIO.dll',
       })
       .promise()
     const response = {
       statusCode: 200,
-      body: JSON.stringify({ ...obj, Location: 'https://mncs-plugin-bucket.s3.us-east-2.amazonaws.com/MNCS.dll' }),
+      body: JSON.stringify({ ...obj, Location: 'https://rl-plugin.s3.us-east-2.amazonaws.com/SOSIO.dll' }),
     }
     callback(null, response)
   } catch (err) {
